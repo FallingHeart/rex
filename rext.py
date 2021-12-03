@@ -3,6 +3,8 @@ __version__ = '0.1.2'
 import pymongo
 import pandas as pd
 import os
+import csv
+import json
 
 
 class mstring():
@@ -46,19 +48,37 @@ class mstring():
     def muti2single_space(s):
         return ' '.join(s.split())
 
+    # 对于来自钉钉云文档的csv下载 务必过滤\xa0
+    def nbsp2space(s):
+        return s.replace('\xa0', ' ')
+
 
 class mlist():
 
-    def from_csv():
-        pass
+    def from_csv(path, options):
+        with open(path, 'r', encoding='utf-8-sig')as f:
+            reader = csv.DictReader(f)
+            data_list = []
+            for each in reader:
+                temp = each
+                if temp[options["important_key"]]:
+                    for key in temp.keys():
+                        temp[key] = mstring.muti2single_space(mstring.remove_space_twoends(mstring.nbsp2space(temp[key])))
+                    data_list.append(temp)
+            return data_list
 
     def to_csv(data_list, columns, path):
         mos.check_dir_and_create(path)
         result_list = pd.DataFrame(columns=columns, data=data_list)
-        result_list.to_csv(path, encoding='utf-8-sig')
+        result_list.to_csv(path, encoding='utf-8-sig', index=False)
 
-    def from_json():
-        pass
+    def from_json(path):
+        with open(path, 'r', encoding='utf-8-sig') as f:
+            pre_data_list = json.load(f)
+            data_list = []
+            for item in pre_data_list:
+                data_list.append(item)
+            return data_list
 
     def to_json(data_list, columns, path):
         mos.check_dir_and_create(path)
