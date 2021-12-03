@@ -22,8 +22,8 @@ pip list
 
 ## import
 
-from rext import str_manage as sm
+from rext import mstring as ms
 
 ## use
 
-print(sm.remove_space("666 666"))
+print(ms.remove_space_all("666 666"))

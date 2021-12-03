@@ -18,11 +18,11 @@ URL = 'https://github.com/FallingHeart/rext'
 EMAIL = 'ceo@bamo.tech'
 AUTHOR = 'rex nathan'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.1.1'
+VERSION = '0.1.2'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    # 'requests', 'maya', 'records',
+    'pymongo', 'pandas',
 ]
 
 # What packages are optional?
