@@ -2,6 +2,7 @@ __version__ = '0.1.2'
 
 import pymongo
 import pandas as pd
+import os
 
 
 class mstring():
@@ -52,7 +53,7 @@ class mlist():
         pass
 
     def to_csv(data_list, columns, path):
-        # path 目录是否存在的判断
+        mos.check_dir_and_create(path)
         result_list = pd.DataFrame(columns=columns, data=data_list)
         result_list.to_csv(path, encoding='utf-8-sig')
 
@@ -60,7 +61,7 @@ class mlist():
         pass
 
     def to_json(data_list, columns, path):
-        # path 目录是否存在的判断
+        mos.check_dir_and_create(path)
         result_list = pd.DataFrame(columns=columns, data=data_list)
         out = result_list.to_json(indent=4, orient='records', force_ascii=False)
         with open(path, 'w', encoding='utf-8-sig')as jsonfile:
@@ -78,6 +79,7 @@ class mdict():
 
 
 class mdb():
+
     def connect_mongodb(options):
         DB_HOST = options['DB_HOST']
         DB_PORT = options['DB_PORT']
@@ -94,6 +96,14 @@ class mdb():
                 myclient = pymongo.MongoClient("mongodb://%s:%s@%s:%s/%s" % (DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_DB))
 
         return myclient[DB_DB]
+
+
+class mos():
+
+    def check_dir_and_create(path):
+        data_dir = "/".join(path.split("/")[0:-1])
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
 
 
 def main():
