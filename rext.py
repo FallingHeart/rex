@@ -7,6 +7,14 @@ import csv
 import json
 
 
+class mos():
+
+    def check_dir_and_create(path):
+        data_dir = "/".join(path.split("/")[0:-1])
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+
+
 class mstring():
 
     # 空白符种类
@@ -93,9 +101,23 @@ class mlist():
         dataCursor = mycol.find(filter)
         return list(dataCursor)
 
+    def to_map(list, key):
+        temp_map = {}
+        for i, item in enumerate(list):
+            if key == "":
+                temp_map[i] = item
+            else:
+                temp_map[item[key]] = item
+        return temp_map
+
 
 class mdict():
-    pass
+
+    def to_list(map):
+        temp_list = []
+        for i in map:
+            temp_list.append(map[i])
+        return temp_list
 
 
 class mdb():
@@ -116,14 +138,6 @@ class mdb():
                 myclient = pymongo.MongoClient("mongodb://%s:%s@%s:%s/%s" % (DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_DB))
 
         return myclient[DB_DB]
-
-
-class mos():
-
-    def check_dir_and_create(path):
-        data_dir = "/".join(path.split("/")[0:-1])
-        if not os.path.exists(data_dir):
-            os.makedirs(data_dir)
 
 
 def main():
