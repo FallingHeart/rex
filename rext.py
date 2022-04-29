@@ -63,6 +63,13 @@ class mstring():
 
 class mlist():
 
+    def get_cols(data_list):
+        columns = []
+        if len(data_list) > 0:
+            first = data_list[0]
+            columns = list(first.keys())
+        return columns
+
     def from_csv(path, options):
         with open(path, 'r', encoding='utf-8-sig')as f:
             reader = csv.DictReader(f)
@@ -79,6 +86,15 @@ class mlist():
         mos.check_dir_and_create(path)
         result_list = pd.DataFrame(columns=columns, data=data_list)
         result_list.to_csv(path, encoding='utf-8-sig', index=False)
+
+    def from_excel(path, sheet_name):
+        temp_df = pd.read_excel(path, sheet_name=sheet_name, dtype=str)
+        data_list = list(temp_df.to_dict('records'))
+        return data_list
+
+    def to_excel(data_list, columns, path):
+        result_list = pd.DataFrame(columns=columns, data=data_list)
+        result_list.to_excel(path, encoding='utf-8-sig', index=False)
 
     def from_json(path):
         with open(path, 'r', encoding='utf-8-sig') as f:
