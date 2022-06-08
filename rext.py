@@ -5,6 +5,10 @@ import pandas as pd
 import os
 import csv
 import json
+import pytz
+import datetime
+import dateutil
+import random
 
 
 class mos():
@@ -13,6 +17,19 @@ class mos():
         data_dir = "/".join(path.split("/")[0:-1])
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
+
+    def get_file_list(path):
+        for root, dirs, files in os.walk(path):
+            pass
+        return files
+
+
+class mtime():
+    def get_iso_time():
+        utc_tz = pytz.timezone('Asia/Shanghai')
+        datestr = datetime.datetime.now(tz=utc_tz).isoformat()
+        mydatetime = dateutil.parser.parse(datestr)
+        return mydatetime
 
 
 class mstring():
@@ -59,6 +76,21 @@ class mstring():
     # 对于来自钉钉云文档的csv下载 务必过滤\xa0
     def nbsp2space(s):
         return s.replace('\xa0', ' ')
+
+    def get_random_36(n):
+        randomStr = ""
+        for i in range(n):
+            temp = random.randrange(0, 3)
+            if temp == 0:
+                ch = chr(random.randrange(ord('A'), ord('Z') + 1))
+                randomStr += ch
+            elif temp == 1:
+                ch = chr(random.randrange(ord('a'), ord('z') + 1))
+                randomStr += ch
+            else:
+                ch = str((random.randrange(0, 10)))
+                randomStr += ch
+        return randomStr
 
 
 class mlist():

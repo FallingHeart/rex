@@ -4,3 +4,4 @@ rext.egg-info
 __pycache__
 test.py
 tmp
+test
