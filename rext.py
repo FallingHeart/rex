@@ -1,4 +1,4 @@
-__version__ = '0.1.2'
+__version__ = '0.1.8'
 
 import pymongo
 import pandas as pd
@@ -27,7 +27,17 @@ class mos():
 class mtime():
     def get_iso_time():
         utc_tz = pytz.timezone('Asia/Shanghai')
-        datestr = datetime.datetime.now(tz=utc_tz).isoformat()
+        datetime_now = datetime.datetime.now(tz=utc_tz)
+        datestr = datetime_now.isoformat()
+        mydatetime = dateutil.parser.parse(datestr)
+        return mydatetime
+
+    def get_iso_time_from_now(days):
+        utc_tz = pytz.timezone('Asia/Shanghai')
+        datetime_now = datetime.datetime.now(tz=utc_tz)
+        datetime_delta = datetime.timedelta(days=days)
+        datetime_end = datetime_now + datetime_delta
+        datestr = datetime_end.isoformat()
         mydatetime = dateutil.parser.parse(datestr)
         return mydatetime
 
