@@ -1,5 +1,9 @@
 # rex
 
+## git commit
+
+vx.x.x
+
 ## clean
 
 python setup.py sdist
