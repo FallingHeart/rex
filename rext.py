@@ -1,4 +1,4 @@
-__version__ = '0.1.8'
+__version__ = '0.1.9'
 
 import pymongo
 import pandas as pd
@@ -167,6 +167,16 @@ class mlist():
             else:
                 temp_map[item[key]] = item
         return temp_map
+
+    def tranlate_header(data, col_dict):
+        result_data = []
+        for row in data:
+            temp = {}
+            for key in row.keys():
+                if key != "":
+                    temp[col_dict[key]] = row[key]
+            result_data.append(temp)
+        return result_data
 
 
 class mdict():
