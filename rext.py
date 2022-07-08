@@ -1,4 +1,4 @@
-__version__ = '0.1.10'
+__version__ = '0.1.11'
 
 import pymongo
 import pandas as pd
@@ -215,6 +215,29 @@ class mdb():
                 myclient = pymongo.MongoClient("mongodb://%s:%s@%s:%s/%s" % (DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_DB))
 
         return myclient[DB_DB]
+
+
+class mcol():
+    def __init__(self, data_list):
+        self.data_list = data_list
+
+    def find_one(self, options):
+        for i in self.data_list:
+            for j in options.keys():
+                if (j in i.keys()) and (i[j] == options[j]):
+                    return i
+        return {}
+
+    def find(self, options):
+        result = []
+        for i in self.data_list:
+            bool_array = []
+            for j in options.keys():
+                if j in i.keys():
+                    bool_array.append(i[j] == options[j])
+            if (len(bool_array) > 0) and (not False in bool_array):
+                result.append(i)
+        return result
 
 
 def main():
