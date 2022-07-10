@@ -1,4 +1,4 @@
-__version__ = '0.1.11'
+__version__ = '0.1.12'
 
 import pymongo
 import pandas as pd
@@ -199,12 +199,12 @@ class mdict():
 
 class mdb():
 
-    def connect_mongodb(options):
+    def connect_mongodb(options, db):
         DB_HOST = options['DB_HOST']
         DB_PORT = options['DB_PORT']
         DB_USER = options['DB_USER']
         DB_PASS = options['DB_PASS']
-        DB_DB = options['DB_DB']
+        DB_DB = db
 
         if DB_USER == "":
             myclient = pymongo.MongoClient("mongodb://%s:%s/" % (DB_HOST, DB_PORT))
