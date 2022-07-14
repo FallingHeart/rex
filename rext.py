@@ -1,4 +1,4 @@
-__version__ = '0.1.13'
+__version__ = '0.1.14'
 
 import pymongo
 import pandas as pd
@@ -183,7 +183,10 @@ class mlist():
         for row in data:
             temp = row
             for key in options.keys():
-                temp[key] = options[key](row)
+                if type(options[key]) == str:
+                    temp[key] = options[key]
+                else:
+                    temp[key] = options[key](row)
             result_data.append(temp)
         return result_data
 
