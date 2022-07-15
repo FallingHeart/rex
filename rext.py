@@ -1,4 +1,4 @@
-__version__ = '0.1.14'
+__version__ = '0.1.15'
 
 import pymongo
 import pandas as pd
@@ -173,7 +173,7 @@ class mlist():
         for row in data:
             temp = {}
             for key in row.keys():
-                if key != "":
+                if (key != "") and (key in options.keys()):
                     temp[options[key]] = row[key]
             result_data.append(temp)
         return result_data
