@@ -1,4 +1,4 @@
-__version__ = '0.1.16'
+__version__ = '0.1.17'
 
 import pymongo
 import pandas as pd
@@ -171,10 +171,13 @@ class mlist():
     def header_handler(data, options):
         result_data = []
         for row in data:
-            temp = row
+            temp = {}
             for key in row.keys():
-                if (key != "") and (key in options.keys()):
-                    temp[options[key]] = row[key]
+                if key != "":
+                    if key in options.keys():
+                        temp[options[key]] = row[key]
+                    else:
+                        temp[key] = row[key]
             result_data.append(temp)
         return result_data
 
