@@ -1,4 +1,4 @@
-__version__ = '0.1.18'
+__version__ = '0.1.19'
 
 import pymongo
 import pandas as pd
@@ -149,7 +149,7 @@ class mlist():
     def to_json(data_list, columns, path):
         mos.check_dir_and_create(path)
         result_list = pd.DataFrame(columns=columns, data=data_list)
-        out = result_list.to_json(indent=4, orient='records', force_ascii=False)
+        out = result_list.to_json(indent=4, orient='records', force_ascii=False).replace(r"\/", "/")
         with open(path, 'w', encoding='utf-8-sig')as jsonfile:
             jsonfile.write(out)
 
