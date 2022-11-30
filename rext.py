@@ -1,5 +1,6 @@
-__version__ = '0.1.19'
+__version__ = '0.1.20'
 
+import re
 import pymongo
 import pandas as pd
 import os
@@ -244,6 +245,22 @@ class mcol():
             if (len(bool_array) > 0) and (not False in bool_array):
                 result.append(i)
         return result
+
+
+class mchem():
+    def is_cas(cas):
+        cas = str(cas).strip()
+        if not re.match('^\d{2,12}-\d{2}-\d$', cas):
+            return False
+        strArr = cas.split('-')
+        if len(strArr) != 3:
+            return False
+        tmpS = strArr[0] + strArr[1]
+        lenofstr = len(tmpS)
+        crcTotal = 0
+        for i in range(0, lenofstr):
+            crcTotal += int(tmpS[i]) * (lenofstr - i)
+        return int(strArr[2]) == (crcTotal % 10)
 
 
 def main():
