@@ -1,4 +1,4 @@
-__version__ = '0.1.20'
+__version__ = '0.1.21'
 
 import re
 import pymongo
@@ -193,6 +193,20 @@ class mlist():
                     temp[key] = options[key](row)
             result_data.append(temp)
         return result_data
+
+    def field_makeup(data, options):
+        if len(data) == 0 or len(options) == 0:
+            return data
+        temp_map = {}
+        for i in options:
+            temp_map[i] = ""
+        for j in data:
+            for k in temp_map.keys():
+                if k in j.keys() and j[k] != "":
+                    temp_map[k] = j[k]
+                else:
+                    j[k] = temp_map[k]
+        return data
 
 
 class mdict():
