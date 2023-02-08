@@ -1,4 +1,4 @@
-__version__ = '0.1.21'
+__version__ = '0.1.22'
 
 import re
 import pymongo
@@ -10,6 +10,8 @@ import pytz
 import datetime
 import dateutil
 import random
+import requests
+import time
 
 
 class mos():
@@ -276,6 +278,61 @@ class mchem():
             crcTotal += int(tmpS[i]) * (lenofstr - i)
         return int(strArr[2]) == (crcTotal % 10)
 
+class mip():
+
+    def remove_invalid_ip(some_db, some_col_name):
+        mycol = some_db[some_col_name]
+        fail_ip_list = mlist.from_mongodb(some_db, some_col_name, {"status": "fail"})
+        for ip in fail_ip_list:
+            if ip['status'] == "fail":
+                mycol.delete_one({'_id': ip['_id']})
+
+
+    def get_ip_from(ip, sleep_time,api_name):
+        if api_name == "ip-api.com":
+            res = requests.get('http://ip-api.com/json/%s' % ip)
+            if res.status_code == 200:
+                ipInfo = res.json()
+                return ipInfo
+            elif res.status_code == 429:
+                print("mip.get_ip_from:X-Rl", res.headers['X-Rl'], "X-Ttl", res.headers['X-Ttl'])
+                if res.headers['X-Rl'] == 0:
+                    sleep_time = res.headers['X-Ttl']
+                else:
+                    sleep_time = 0
+                # 这个接口最高每分钟45次，多了要收费，详见https://members.ip-api.com/#pricing
+                time.sleep(sleep_time)
+                return mip.get_ip_from(ip, sleep_time,api_name)
+        else:
+            return {
+                'status':"fail"
+            }
+
+
+    def ip_to_db(some_list, ip_key, some_col):
+        len_of_list = len(some_list)
+        print("mip.ip_to_db:len_of_list", len_of_list)
+        for i, item in enumerate(some_list):
+            print(i + 1, len_of_list, end="\r")
+            if type(item) == type(""):
+                ip = item
+            if type(item) == type({}):
+                ip = item[ip_key]
+            if ip == '127.0.0.1':
+                print('mip.ip_to_db:ip localhost')
+                continue
+            existIp = some_col.find_one({'query': ip})  # "ip-api.com"接口的返回中，ip字段为query
+            if not existIp:
+                ipInfo = mip.get_ip_from(ip, 0, "ip-api.com")
+                if ipInfo['status'] == 'success':
+                    insertResult = some_col.insert_one(ipInfo)
+                    if insertResult:
+                        print('mip.ip_to_db:ip %s inserted' % ip)
+                    else:
+                        print('mip.ip_to_db:ip %s insert err' % ip)
+                else:
+                    print('mip.ip_to_db: ',ipInfo)
+    
 
 def main():
     pass
