@@ -20,6 +20,14 @@ pip intall rext
 
 pip install --upgrade rext
 
+## upgrade 指定版本
+
+pip install --upgrade rext==0.1.22
+
+## 镜像会同步不及时，临时使用默认镜像更新
+
+pip install -i https://pypi.org/simple --upgrade rext
+
 ## list
 
 pip list
