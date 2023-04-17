@@ -1,4 +1,4 @@
-__version__ = '0.1.22'
+__version__ = '0.1.23'
 
 import re
 import pymongo
@@ -105,6 +105,49 @@ class mstring():
                 randomStr += ch
         return randomStr
 
+    def may_equal_item(s):
+        return mstring.remove_white_all(s.upper()).replace('-', '')
+    
+    def may_equal(a, b):
+        return a == mstring.may_equal_item(b)
+    
+    def may_equal_conf(a, b):
+        for i in [a,b]:
+            # a b都要是对象
+            if type(i) is not type({}):
+                raise TypeError
+            # a b都要有item和keys两个键
+            if 'item' in i.keys() and 'keys' in i.keys() :
+                pass
+            else:
+                raise KeyError
+            # a b的item值都要是对象
+            if type(i['item']) is not type({}) :
+                raise TypeError
+            # a b的keys值都要是数组
+            if type(i['keys']) is not type([]):
+                raise TypeError
+            # a b的keys值都要是非空数组
+            if len(i['keys']) == 0 :
+                raise TypeError
+        flag = False
+        for a_key in a['keys']:
+            if a_key in a['item'].keys() and a['item'][a_key] != "" and a['item'][a_key] != None:
+                # a 有值
+                for b_key in b['keys']:
+                    if b_key in b['item'].keys() and b['item'][b_key] != "" and b['item'][b_key] != None:
+                        # b 有值
+                        flag = mstring.may_equal_item(a['item'][a_key]) == mstring.may_equal_item(b['item'][b_key])
+                        if flag:
+                            return flag
+                    else:
+                        # b 无值
+                        continue
+            else:
+                # a 无值
+                continue
+        return flag
+
 
 class mlist():
 
@@ -167,8 +210,10 @@ class mlist():
         for i, item in enumerate(list):
             if key == "":
                 temp_map[i] = item
-            else:
+            elif key in item.keys():
                 temp_map[item[key]] = item
+            else:
+                temp_map[key(item)] = item
         return temp_map
 
     def header_handler(data, options):
