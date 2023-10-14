@@ -1,6 +1,7 @@
-__version__ = '0.1.23'
+__version__ = '0.1.24'
 
 import re
+import threading
 import pymongo
 import pandas as pd
 import os
@@ -107,28 +108,28 @@ class mstring():
 
     def may_equal_item(s):
         return mstring.remove_white_all(s.upper()).replace('-', '')
-    
+
     def may_equal(a, b):
         return a == mstring.may_equal_item(b)
-    
+
     def may_equal_conf(a, b):
-        for i in [a,b]:
+        for i in [a, b]:
             # a b都要是对象
             if type(i) is not type({}):
                 raise TypeError
             # a b都要有item和keys两个键
-            if 'item' in i.keys() and 'keys' in i.keys() :
+            if 'item' in i.keys() and 'keys' in i.keys():
                 pass
             else:
                 raise KeyError
             # a b的item值都要是对象
-            if type(i['item']) is not type({}) :
+            if type(i['item']) is not type({}):
                 raise TypeError
             # a b的keys值都要是数组
             if type(i['keys']) is not type([]):
                 raise TypeError
             # a b的keys值都要是非空数组
-            if len(i['keys']) == 0 :
+            if len(i['keys']) == 0:
                 raise TypeError
         flag = False
         for a_key in a['keys']:
@@ -208,12 +209,18 @@ class mlist():
     def to_map(list, key):
         temp_map = {}
         for i, item in enumerate(list):
-            if key == "":
-                temp_map[i] = item
-            elif key in item.keys():
-                temp_map[item[key]] = item
-            else:
-                temp_map[key(item)] = item
+            if type(key) == str:
+                if key == "":
+                    temp_map[i] = item
+                elif key in item.keys():
+                    temp_map[item[key]] = item
+                else:
+                    temp_map[key(item)] = item
+            if type(key) == type([]):
+                temp = item
+                for inner in key:
+                    temp = temp[inner]
+                temp_map[temp] = item
         return temp_map
 
     def header_handler(data, options):
@@ -236,6 +243,11 @@ class mlist():
             for key in options.keys():
                 if type(options[key]) == str:
                     temp[key] = options[key]
+                elif type(options[key]) == type({}):
+                    temp_inner = {}
+                    for inner in options[key].keys():
+                        temp_inner[inner] = temp[options[key][inner]]
+                    temp[key] = temp_inner
                 else:
                     temp[key] = options[key](row)
             result_data.append(temp)
@@ -307,6 +319,23 @@ class mcol():
                 result.append(i)
         return result
 
+    def distinct(self, field):
+        def get_result(field_value, result):
+            if type(field_value) == type(''):
+                if field_value in result.keys():
+                    result[field_value] += 1
+                else:
+                    result[field_value] = 1
+            if type(field_value) == type([]):
+                for j in field_value:
+                    get_result(j, result)
+            return result
+        result = {}
+        for i in self.data_list:
+            field_value = i[field]
+            result = get_result(field_value, result)
+        return result
+
 
 class mchem():
     def is_cas(cas):
@@ -323,6 +352,7 @@ class mchem():
             crcTotal += int(tmpS[i]) * (lenofstr - i)
         return int(strArr[2]) == (crcTotal % 10)
 
+
 class mip():
 
     def remove_invalid_ip(some_db, some_col_name):
@@ -332,8 +362,7 @@ class mip():
             if ip['status'] == "fail":
                 mycol.delete_one({'_id': ip['_id']})
 
-
-    def get_ip_from(ip, sleep_time,api_name):
+    def get_ip_from(ip, sleep_time, api_name):
         if api_name == "ip-api.com":
             res = requests.get('http://ip-api.com/json/%s' % ip)
             if res.status_code == 200:
@@ -347,12 +376,11 @@ class mip():
                     sleep_time = 0
                 # 这个接口最高每分钟45次，多了要收费，详见https://members.ip-api.com/#pricing
                 time.sleep(sleep_time)
-                return mip.get_ip_from(ip, sleep_time,api_name)
+                return mip.get_ip_from(ip, sleep_time, api_name)
         else:
             return {
-                'status':"fail"
+                'status': "fail"
             }
-
 
     def ip_to_db(some_list, ip_key, some_col):
         len_of_list = len(some_list)
@@ -376,8 +404,84 @@ class mip():
                     else:
                         print('mip.ip_to_db:ip %s insert err' % ip)
                 else:
-                    print('mip.ip_to_db: ',ipInfo)
-    
+                    print('mip.ip_to_db: ', ipInfo)
+
+
+class mthread():
+
+    def multi_threading(data_list, get_part_data):
+
+        result_list = []
+        error_list = []
+
+        def get_treadList(total_num, group_size):
+            group_num = total_num // group_size
+            all_rest = total_num % group_size
+            end = 0
+            treadList = []
+            for item in range(0, group_num):
+                start = item * group_size
+                end = (item + 1) * group_size
+                treadList.append({'start': start, 'end': end})
+            if all_rest != 0:
+                treadList.append({'start': end, 'end': end + all_rest})
+            return treadList
+
+        def get_all_data(treadName, start_end_dict):
+
+            start = int(start_end_dict['start'])
+            end = int(start_end_dict['end'])
+            total = end - start + 1
+            return get_part_data(data_list, start, end)
+
+        class myThread(threading.Thread):
+            def __init__(self, threadID, name, start_end_dict):
+                threading.Thread.__init__(self)
+                self.threadID = threadID
+                self.name = name
+                self.start_end_dict = start_end_dict
+                self.result_list = []
+                self.error_list = []
+
+            def run(self):
+                print("开始线程：" + self.name)
+                part_result_list, part_error_list = get_all_data(self.name, self.start_end_dict)
+                self.result_list = self.result_list + part_result_list
+                self.error_list = self.error_list + part_error_list
+                print("退出线程：" + self.name)
+
+        treadList = get_treadList(len(data_list), 500)
+
+        print('将数据分成了 %d 个线程进行爬取，分组为:' % len(treadList))
+        [print(x) for x in treadList]
+
+        threads = []
+
+        for x in range(len(treadList)):
+
+            t = myThread(x, "Thread-" + str(x), treadList[x])  # 创建
+
+            # t.setDaemon(True)  # 加入这个和下面那个 可以使用Ctrl+C 优雅的退出
+
+            threads.append(t)
+
+            t.start()  # 启动
+
+        for t in threads:
+
+            t.join()  # 等待
+            result_list = result_list + t.result_list
+            error_list = error_list + t.error_list
+
+            # while 1:  # 用这个替代 可以使用Ctrl+C 优雅的退出
+            #     if t.is_alive():
+            #         time.sleep(10)
+            # else:
+            #     break
+
+        print("退出主线程")
+        return (result_list, error_list)
+
 
 def main():
     pass
