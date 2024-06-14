@@ -2,8 +2,8 @@
 
 ## code
 
-rext.py**version** = '0.1.27'
-setup.py:VERSION = '0.1.27'
+rext.py**version** = '0.1.28'
+setup.py:VERSION = '0.1.28'
 
 ## git commit
 
