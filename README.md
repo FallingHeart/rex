@@ -1,4 +1,9 @@
-# rex
+# rext
+
+## code
+
+rext.py**version** = '0.1.26'
+setup.py:VERSION = '0.1.26'
 
 ## git commit
 
