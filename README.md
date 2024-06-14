@@ -2,12 +2,16 @@
 
 ## code
 
-rext.py**version** = '0.1.26'
-setup.py:VERSION = '0.1.26'
+rext.py**version** = '0.1.27'
+setup.py:VERSION = '0.1.27'
 
 ## git commit
 
-vx.x.x
+commit
+
+create tag vx.x.x
+
+DON'T push
 
 ## clean
 
