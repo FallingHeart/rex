@@ -7,6 +7,11 @@
         "--ignore",
         "E402"
     ],
+    "autopep8.args": [
+        "--max-line-length",
+        "1000",
+        "--experimental"
+    ],
     "editor.fontFamily": "Fira Code,Menlo, Monaco, 'Courier New', monospace",
     "editor.fontLigatures": true,
     "editor.formatOnPaste": true,

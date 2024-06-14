@@ -25,6 +25,8 @@ class mos():
     def get_file_list(path):
         for root, dirs, files in os.walk(path):
             pass
+        if '.DS_Store' in files:
+            files.remove('.DS_Store')
         return files
 
 
@@ -197,7 +199,7 @@ class mlist():
         mos.check_dir_and_create(path)
         result_list = pd.DataFrame(columns=columns, data=data_list)
         out = result_list.to_json(indent=4, orient='records', force_ascii=False).replace(r"\/", "/")
-        with open(path, 'w', encoding='utf-8-sig')as jsonfile:
+        with open(path, 'w', encoding='utf-8')as jsonfile:
             jsonfile.write(out)
 
     def from_mongodb(db, col, filter):
@@ -239,7 +241,7 @@ class mlist():
     def field_handler(data, options):
         result_data = []
         for row in data:
-            temp = row
+            temp = dict(row)
             for key in options.keys():
                 if type(options[key]) == str:
                     temp[key] = options[key]
