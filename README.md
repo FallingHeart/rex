@@ -9,7 +9,7 @@ setup.py:VERSION = '0.1.27'
 
 commit
 
-create tag vx.x.x
+DON'T create tag vx.x.x
 
 DON'T push
 
